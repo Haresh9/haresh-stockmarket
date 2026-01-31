@@ -1,7 +1,7 @@
 import React from 'react';
 import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
 
-const MarketStrength = ({ data }) => {
+const MarketStrength = ({ data, onClick }) => {
 
   // Helper to format numbers in Indian System (Lkh/Cr)
   const formatVolume = (num) => {
@@ -32,19 +32,22 @@ const MarketStrength = ({ data }) => {
   if (isBearish) sentimentColor = "#ef4444";
 
   return (
-    <div className="glass-panel" style={{
-      padding: '0.4rem 0.6rem',
-      width: '100%',
-      boxSizing: 'border-box',
-      display: 'flex',
-      flexDirection: 'column',
-      gap: '0.2rem',
-      fontSize: '0.75rem',
-      background: isBullish ? 'rgba(22, 101, 34, 0.6)' : isBearish ? 'rgba(153, 27, 27, 0.4)' : 'rgba(71, 85, 105, 0.3)',
-      border: isBullish ? '1px solid rgba(22, 101, 34, 0.8)' : isBearish ? '1px solid rgba(153, 27, 27, 0.6)' : '1px solid rgba(148, 163, 184, 0.3)',
-      transition: 'all 0.3s ease',
-      color: 'white' // Reverted to white
-    }}>
+    <div className="glass-panel"
+      onClick={() => onClick && onClick(symbol)}
+      style={{
+        padding: '0.4rem 0.6rem',
+        width: '100%',
+        boxSizing: 'border-box',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '0.2rem',
+        fontSize: '0.75rem',
+        background: isBullish ? 'rgba(22, 101, 34, 0.6)' : isBearish ? 'rgba(153, 27, 27, 0.4)' : 'rgba(71, 85, 105, 0.3)',
+        border: isBullish ? '1px solid rgba(22, 101, 34, 0.8)' : isBearish ? '1px solid rgba(153, 27, 27, 0.6)' : '1px solid rgba(148, 163, 184, 0.3)',
+        transition: 'all 0.3s ease',
+        color: 'white', // Reverted to white
+        cursor: 'pointer'
+      }}>
       {/* Symbol and Price */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <h3 style={{ margin: 0, fontSize: '0.9rem', fontWeight: 700, color: 'white', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{symbol}</h3>

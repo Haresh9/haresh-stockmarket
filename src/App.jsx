@@ -1,11 +1,16 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Login from './components/Login';
 import MarketStrength from './components/MarketStrength';
+import StockChartModal from './components/StockChartModal';
 import './index.css';
 
 function App() {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [marketData, setMarketData] = useState(null);
+    const [selectedStock, setSelectedStock] = useState(null);
+    const [historyData, setHistoryData] = useState([]);
+    const [isChartLoading, setIsChartLoading] = useState(false);
+    const [isChartOpen, setIsChartOpen] = useState(false);
     const ws = useRef(null);
 
     // WebSocket Connection Logic
@@ -36,6 +41,28 @@ function App() {
             };
         }
     }, [isLoggedIn]);
+
+    const handleStockClick = async (symbol) => {
+        setSelectedStock(symbol);
+        setIsChartOpen(true);
+        setIsChartLoading(true);
+        setHistoryData([]);
+
+        try {
+            const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+            const response = await fetch(`${baseUrl}/stock-history/${symbol}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch history');
+            }
+            const data = await response.json();
+            setHistoryData(data);
+        } catch (error) {
+            console.error("Error fetching history:", error);
+            // Optionally set query state or empty data
+        } finally {
+            setIsChartLoading(false);
+        }
+    };
 
     return (
         <div style={{
@@ -75,7 +102,11 @@ function App() {
                             padding: '0.5rem'
                         }}>
                             {[...marketData].sort((a, b) => b.strengthPercent - a.strengthPercent).map((stock) => (
-                                <MarketStrength key={stock.symbol} data={stock} />
+                                <MarketStrength
+                                    key={stock.symbol}
+                                    data={stock}
+                                    onClick={handleStockClick}
+                                />
                             ))}
                         </div>
                     ) : (
@@ -85,6 +116,14 @@ function App() {
                     )}
                 </div>
             )}
+
+            <StockChartModal
+                isOpen={isChartOpen}
+                onClose={() => setIsChartOpen(false)}
+                symbol={selectedStock}
+                data={historyData}
+                loading={isChartLoading}
+            />
         </div>
     );
 }
